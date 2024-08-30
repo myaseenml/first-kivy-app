@@ -1,26 +1,26 @@
-import kivy
 from kivy.app import App
-from kivy.uix.label import Label
-from kivy.uix.textinput import TextInput
-from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.utils import platform
+from jnius import autoclass
 
-
-class LoginScreen(GridLayout):
-    def __init__(self, **kwargs):
-        super(LoginScreen, self).__init__(**kwargs)
-        self.cols = 2
-        self.add_widget(Label(text="User Name"))
-        self.username = TextInput(multiline=True)
-        self.add_widget(self.username)
-        self.add_widget(Label(text="Password"))
-        self.password = TextInput(multiline=True)
-        self.add_widget(self.password)
-
-
-class MyApp(App):
+class MainApp(App):
     def build(self):
-        return LoginScreen()
+        layout = BoxLayout(orientation='vertical')
 
+        if platform == 'android':
+            # Load the Android WebView
+            WebView = autoclass('android.webkit.WebView')
+            WebViewClient = autoclass('android.webkit.WebViewClient')
+            activity = autoclass('org.kivy.android.PythonActivity').mActivity
+            webview = WebView(activity)
+            webview.getSettings().setJavaScriptEnabled(True)
+            webview.setWebViewClient(WebViewClient())
+            webview.loadUrl('https://yaseenuom.pythonanywhere.com/')
+            
+            # Add the WebView to the layout
+            layout.add_widget(webview)
+        
+        return layout
 
 if __name__ == '__main__':
-    MyApp().run()
+    MainApp().run()
